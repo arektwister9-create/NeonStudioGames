@@ -1,6 +1,25 @@
-# NEON EMPIRE 0.7.1 — Android
+# NEON EMPIRE 0.8.0 — Android
 
-Polska gra idle offline. `versionName 0.7.1`, `versionCode 9`; identyfikatory Android i zasoby startowe z 0.7.0 pozostają zachowane.
+Polska gra idle offline. `versionName 0.8.0`, `versionCode 10`; identyfikatory Android i zasoby startowe z 0.7.0 pozostają zachowane.
+
+## Nowość: kampania „Przebudzenie rdzenia”
+
+Cel gry: zdobyć sześć fragmentów i otworzyć bramę międzygwiezdną. Przy rdzeniu widać aktualny rozdział, fabułę, wymagania, nagrodę i skróty prowadzące do potrzebnych kolonii, badań i ulepszeń. Celami są konkretne konstrukcje i technologie, nie samo przekraczanie kolejnych progów energii.
+
+Każde dotknięcie ładuje pierścień rdzenia. Po 12 dotknięciach gracz może **wyzwolić puls**, który daje energię i zasila latarnie potrzebne w kampanii. Ładunek nie wygasa. Kolejne fragmenty zwiększają siłę pulsów o 15% wartości bazowej i co dwa rozdziały zmniejszają liczbę wymaganych dotknięć. Nagroda pulsu: `ceil(max(25, produkcja × 15 + energiaDotknięcia × 8) × (1 + 0.15 × ukończoneRozdziały))`. Puls nie zmienia stałych bonusów planet ani produkcji offline.
+
+| Rozdział | Cel rozwoju | Pulsy łącznie | Nagroda energii |
+| --- | --- | ---: | ---: |
+| Pierwszy sygnał | 3 drony | 1 | 250 |
+| Latarnia Luna-9 | Luna, poziom 2 | 3 | 2 500 |
+| Przekaźnik Marsa | Mars, poziom 3; Nadprzewodnictwo | 5 | 15 000 |
+| Echo Tytana | Tytan, poziom 2; Sieć nadprzewodząca | 8 | 75 000 |
+| Stabilizacja bramy | Każda kolonia, poziom 5; Rezonans rdzenia | 12 | 250 000 |
+| Po drugiej stronie | Każda kolonia, poziom 7; Tytan, poziom 10; Serce Tytana | 18 | 1 000 000 |
+
+Po spełnieniu wymagań gracz powtarza sekwencję trzech ponumerowanych, kolorowych węzłów. Nie ma limitu czasu ani kary zasobowej za błąd. Numery umożliwiają grę bez rozróżniania kolorów; przyciski obsługują klawiaturę. Krok synchronizacji, rozdziały, liczba pulsów i ładunek są zapisywane jako opcjonalne `coreCampaign` w istniejącym formacie `version: 5`. Zapisy 0.6.1, 0.7.0 i 0.7.1 zachowują postęp i otrzymują pustą kampanię. Posiadane kolonie i technologie od razu liczą się do celów. Nagroda za rozdział jest jednorazowa.
+
+Finał otwiera widoczną bramę wokół rdzenia i pokazuje zakończenie. Gra pozostaje dostępna po finale; nie ma resetu ani utraty kolonii. Nowe efekty respektują ograniczenie animacji i ustawienia dźwięku z 0.7.1.
 
 ## Rdzeń i dźwięk
 
@@ -55,12 +74,13 @@ Import/eksport JSON i Android Storage Access Framework pozostają dostępne. Zas
 for file in app/src/main/assets/*.js; do node --check "$file"; done
 node tests/economy.test.cjs
 node tests/audio.test.cjs
+node tests/campaign.test.cjs
 # Python Playwright i Chromium wymagane do testu UI:
 python tests/browser_smoke.py
 # JDK 17+, Gradle 8.9, Android SDK 35:
 gradle --no-daemon assembleDebug bundleRelease
 ```
 
-GitHub Actions uruchamia te kontrole, buduje APK/AAB, sprawdza podpis, wersję i integralność wszystkich zasobów w APK, a następnie instaluje i uruchamia aplikację w emulatorze Androida. Po powodzeniu artefakt `neon-empire-0.7.1-apk` zawiera `app-debug.apk` i `SHA256SUMS`. `neon-empire-0.7.1-aab` zawiera bundle. Bez sekretów podpisu AAB pozostaje niepodpisany.
+GitHub Actions uruchamia te kontrole, buduje APK/AAB, sprawdza podpis, wersję i integralność wszystkich zasobów w APK, a następnie instaluje i uruchamia aplikację w emulatorze Androida. Po powodzeniu artefakt `neon-empire-0.8.0-apk` zawiera `app-debug.apk` i `SHA256SUMS`. `neon-empire-0.8.0-aab` zawiera bundle. Bez sekretów podpisu AAB pozostaje niepodpisany.
 
 Opcjonalne sekrety wydawnicze: `NEON_KEYSTORE_BASE64`, `NEON_KEYSTORE_PASSWORD`, `NEON_KEY_ALIAS`, `NEON_KEY_PASSWORD`. Ranking globalny nadal wymaga konfiguracji Google Play Games.

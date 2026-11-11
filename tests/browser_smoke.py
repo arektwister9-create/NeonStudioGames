@@ -88,7 +88,39 @@ with sync_playwright() as p:
     assert page.locator('[data-planet="luna"] .colony-unlock').count()==1
     page.screenshot(path=str(OUT/'unlock-and-core.png'),full_page=True)
     c.close()
+    # First campaign loop: real charge, pulse, wrong node, correct sync, durable reward.
+    journey=dict(legacy,energy=1000,total=1000,planets={},levels={'drone':3,'solar':0,'server':0,'reactor':0,'portal':0})
+    c,page=open_game(journey)
+    assert page.locator('#beginSync').is_disabled()
+    page.locator('#campaignGoals .goal-link').first.click();assert page.locator('#tap').evaluate('e=>e===document.activeElement');assert page.locator('#tap').get_attribute('tabindex')!='-1'
+    for _ in range(12):page.locator('#tap').dispatch_event('click')
+    assert page.locator('#releasePulse').is_enabled()
+    page.locator('#releasePulse').click()
+    assert page.locator('#releasePulse').is_disabled()
+    assert page.locator('#beginSync').is_enabled()
+    page.locator('#beginSync').click()
+    page.locator('[data-node="1"]').click()
+    assert 'nie tracisz' in page.locator('#syncStatus').inner_text()
+    for node in [0,2,1]:page.locator('[data-node="'+str(node)+'"]').click()
+    assert page.locator('#campaignTitle').inner_text()=='Latarnia Luna-9'
+    saved=page.evaluate('JSON.parse(localStorage.getItem("neonEmpireSave"))')
+    assert saved['coreCampaign']['chapter']==1 and saved['coreCampaign']['pulses']==1
+    assert saved['coreCampaign']['charge']==0
+    page.screenshot(path=str(OUT/'first-fragment.png'),full_page=True)
+    c.close()
+    # Final campaign objective and genuine last sequence open the persistent gate.
+    finale=dict(legacy,energy=1e8,total=1e8,colonies={'luna':10,'mars':10,'titan':10},technologies={'lattice':True,'resonance':True,'heart':True},coreCampaign={'chapter':5,'pulses':17,'charge':9})
+    c,page=open_game(finale,width=390)
+    page.locator('#tap').dispatch_event('click');page.locator('#releasePulse').click();page.locator('#beginSync').click()
+    for node in [1,2,0,2,1,0]:page.locator('[data-node="'+str(node)+'"]').click()
+    assert page.locator('#coreStage').evaluate('e=>e.classList.contains("gate-open")')
+    assert page.locator('#campaignEnding').is_visible()
+    assert page.locator('#beginSync').is_hidden()
+    assert page.evaluate('JSON.parse(localStorage.getItem("neonEmpireSave")).coreCampaign.chapter')==6
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    page.screenshot(path=str(OUT/'gate-open.png'),full_page=True)
+    c.close()
     assert not errors,errors
     b.close()
 server.shutdown()
-print('PASS: touch/keyboard/focus, bounded effects, audio consent/volumes, 0.6.1/0.7.0 saves, offline cap, 30 colony levels, Titan technologies, export/import, 320px/800px, reduced motion, unlock animation; no JS errors')
+print('PASS: touch/keyboard/focus, bounded effects, audio consent/volumes, 0.6.1/0.7.0 saves, offline cap, 30 colony levels, Titan technologies, export/import, 320px/800px, reduced motion, unlock animation, campaign charging/sync/retry/rewards and final gate; no JS errors')

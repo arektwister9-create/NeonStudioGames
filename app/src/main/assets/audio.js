@@ -33,7 +33,7 @@ async function gesture(){
 function sfx(kind){
  if(!ctx||ctx.state!=='running'||document.hidden||prefs.effectsVolume===0)return;
  const now=ctx.currentTime;if(kind==='click'&&now-lastClick<.045)return;if(kind==='click')lastClick=now;
- const notes={click:[660,990],upgrade:[392,523,784],planet:[220,330,440,660],evolve:[262,392,523,784,1047],build:[196,294,392]}[kind]||[440];
+ const notes={click:[660,990],upgrade:[392,523,784],planet:[220,330,440,660],evolve:[262,392,523,784,1047],build:[196,294,392],ready:[523,784],pulse:[131,262,392,784],sync:[660,880],retry:[262,220]}[kind]||[440];
  notes.forEach((f,i)=>tone(f,now+i*(kind==='click'?.022:.08),kind==='click'?.10:.42,kind==='click'?.07:.09,effects,kind==='build'?'triangle':'sine'));
 }
 function updateUI(){const b=document.getElementById('musicToggle');b.textContent=prefs.musicConsent?'Wyłącz muzykę':'Włącz muzykę — zgadzam się';b.setAttribute('aria-pressed',String(prefs.musicConsent));for(const [id,key] of [['musicVolume','musicVolume'],['effectsVolume','effectsVolume']]){document.getElementById(id).value=Math.round(prefs[key]*100);document.getElementById(id+'Value').textContent=Math.round(prefs[key]*100)+'%'}}
