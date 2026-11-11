@@ -41,6 +41,9 @@ with sync_playwright() as p:
     assert prefs['musicVolume']==.31 and prefs['effectsVolume']==.72
     page.locator('#musicToggle').click();assert page.locator('#musicToggle').get_attribute('aria-pressed')=='false'
     page.screenshot(path=str(OUT/'audio-settings.png'),full_page=True)
+    before_policy=page.locator('#energy').inner_text()
+    page.locator('.privacy-link').click();assert 'arektwister9@gmail.com' in page.locator('body').inner_text()
+    page.locator('a[href="index.html"]').click();assert page.locator('#energy').inner_text()==before_policy
     c.close()
     for version in ['0.6.1','0.7.0']:
         c,page=open_game(legacy)
@@ -167,6 +170,10 @@ with sync_playwright() as p:
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     page.screenshot(path=str(OUT/'galactic-station-320px.png'),full_page=True)
     page.locator('#coreStage').screenshot(path=str(OUT/'complete-core-playfield.png'))
+    c.close()
+    c,page=open_game(width=1280)
+    page.set_viewport_size({'width':1280,'height':720});page.locator('#tap').click();page.locator('#startExpedition').click();page.locator('[data-target]').first.click()
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     c.close()
     assert not errors,errors
     b.close()

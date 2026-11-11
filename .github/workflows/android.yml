@@ -20,12 +20,12 @@ jobs:
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'
+          gradle-version: '8.11.1'
       - uses: android-actions/setup-android@v4
       - name: Install Android SDK
         run: |
           yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - name: Validate JavaScript
         run: |
           for file in app/src/main/assets/*.js; do node --check "$file"; done
@@ -58,9 +58,9 @@ jobs:
       - name: Verify installable APK
         run: |
           APK=app/build/outputs/apk/debug/app-debug.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | tee /tmp/neon-badging.txt
-          grep -q "name='pl.neonempire.game.debug' versionCode='11' versionName='0.9.0'" /tmp/neon-badging.txt
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee /tmp/neon-badging.txt
+          grep -q "name='pl.neonempire.game.debug' versionCode='12' versionName='0.9.1'" /tmp/neon-badging.txt
           unzip -t "$APK"
           for file in app/src/main/assets/*; do unzip -p "$APK" "assets/$(basename "$file")" | cmp - "$file"; done
           sha256sum "$APK" > app/build/outputs/apk/debug/SHA256SUMS
@@ -79,7 +79,7 @@ jobs:
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
-          name: neon-empire-0.9.0-apk
+          name: neon-empire-0.9.1-apk
           path: |
             app/build/outputs/apk/debug/app-debug.apk
             app/build/outputs/apk/debug/SHA256SUMS
@@ -88,7 +88,7 @@ jobs:
       - name: Upload Play Store bundle
         uses: actions/upload-artifact@v4
         with:
-          name: neon-empire-0.9.0-aab
+          name: neon-empire-0.9.1-development-aab
           path: app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 30

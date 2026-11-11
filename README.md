@@ -1,6 +1,14 @@
-# NEON EMPIRE 0.9.0 — Android
+# NEON EMPIRE 0.9.1 — Android
 
-Polska gra idle offline. `versionName 0.9.0`, `versionCode 11`; identyfikatory Android i zasoby startowe z 0.7.0 pozostają zachowane.
+Polska gra idle offline. `versionName 0.9.1`, `versionCode 12`; identyfikatory Android i zasoby startowe z 0.7.0 pozostają zachowane.
+
+## Publikacja w Google Play
+
+Wydanie 0.9.1 celuje w Androida 16 / API 36, korzysta z AGP 8.10.1, Gradle 8.11.1 i JDK 17. Dodano obsługę bezpiecznych obszarów ekranu, systemowego przycisku Wstecz, orientacji poziomej i adaptacyjną ikonę. Polityka prywatności jest dostępna z menu gry oraz w `docs/privacy/`. Nieudostępniony ranking globalny nie jest wyświetlany w menu sklepowej wersji.
+
+Instrukcja konta, testów wewnętrznych, podpisu i deklaracji: [docs/GOOGLE_PLAY.md](docs/GOOGLE_PLAY.md). Opisy i grafiki są w `fastlane/metadata/android/pl-PL/` oraz `store-assets/`. Publiczny kontakt: arektwister9@gmail.com.
+
+Workflow **Build signed Google Play bundle** tworzy podpisany pakiet dopiero po ustawieniu sekretów upload key. `scripts/verify-play-bundle.py` sprawdza podpis AAB, produkcyjny identyfikator `pl.neonempire.game`, wersję, API 36, brak debugowania i komplet lokalnych zasobów. Klucze oraz hasła nie są częścią repozytorium. Zwykły artefakt `development-aab` nie jest automatycznie pakietem do Google Play. Nie wykonano automatycznego przesłania ani publicznej publikacji w Play Console.
 
 ## Nowość: 30 aktywnych poziomów i widoczna stacja
 
@@ -107,10 +115,10 @@ node tests/campaign.test.cjs
 node tests/expedition.test.cjs
 # Python Playwright i Chromium wymagane do testu UI:
 python tests/browser_smoke.py
-# JDK 17+, Gradle 8.9, Android SDK 35:
+# JDK 17+, Gradle 8.11.1, Android SDK 36:
 gradle --no-daemon assembleDebug bundleRelease
 ```
 
-GitHub Actions uruchamia te kontrole, buduje APK/AAB, sprawdza podpis, wersję i integralność wszystkich zasobów w APK, a następnie instaluje i uruchamia aplikację w emulatorze Androida. Po powodzeniu artefakt `neon-empire-0.9.0-apk` zawiera `app-debug.apk` i `SHA256SUMS`. `neon-empire-0.9.0-aab` zawiera bundle. Bez sekretów podpisu AAB pozostaje niepodpisany.
+GitHub Actions uruchamia te kontrole, buduje APK/AAB, sprawdza podpis, wersję i integralność wszystkich zasobów w APK, a następnie instaluje i uruchamia aplikację w emulatorze Androida. Po powodzeniu artefakt `neon-empire-0.9.1-apk` zawiera `app-debug.apk` i `SHA256SUMS`. `neon-empire-0.9.1-aab` zawiera bundle. Bez sekretów podpisu AAB pozostaje niepodpisany.
 
 Opcjonalne sekrety wydawnicze: `NEON_KEYSTORE_BASE64`, `NEON_KEYSTORE_PASSWORD`, `NEON_KEY_ALIAS`, `NEON_KEY_PASSWORD`. Ranking globalny nadal wymaga konfiguracji Google Play Games.

@@ -7,6 +7,10 @@ import android.net.Uri;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import android.os.Bundle;
+import android.os.Build;
+import android.graphics.Insets;
+import android.view.WindowInsets;
+import android.widget.FrameLayout;
 import android.os.Environment;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
@@ -27,7 +31,27 @@ public class MainActivity extends Activity {
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         webView = new WebView(this);
-        setContentView(webView);
+        webView.setBackgroundColor(0xff050816);
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(0xff050816);
+        root.addView(webView, new FrameLayout.LayoutParams(-1, -1));
+        root.setOnApplyWindowInsetsListener((view, insets) -> {
+            if (Build.VERSION.SDK_INT >= 30) {
+                Insets safe = insets.getInsets(WindowInsets.Type.systemBars()
+                        | WindowInsets.Type.displayCutout() | WindowInsets.Type.ime());
+                view.setPadding(safe.left, safe.top, safe.right, safe.bottom);
+                return WindowInsets.CONSUMED;
+            }
+            view.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),
+                    insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
+            return insets.consumeSystemWindowInsets();
+        });
+        setContentView(root);
+        root.requestApplyInsets();
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::navigateBack);
+        }
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
@@ -35,7 +59,22 @@ public class MainActivity extends Activity {
         settings.setAllowContentAccess(true);
         settings.setMediaPlaybackRequiresUserGesture(true);
         webView.addJavascriptInterface(new GameBridge(), "NeonEmpireAndroid");
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url.startsWith("mailto:")) {
+                    try { startActivity(new Intent(Intent.ACTION_SENDTO, Uri.parse(url))); }
+                    catch (Exception e) { Toast.makeText(MainActivity.this, "Kontakt: arektwister9@gmail.com", Toast.LENGTH_LONG).show(); }
+                    return true;
+                }
+                if (url.startsWith("file:///android_asset/")) return false;
+                // Untrusted pages never receive the local game's JavaScript bridge.
+                if (url.startsWith("https://") || url.startsWith("http://")) {
+                    try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); }
+                    catch (Exception e) { Toast.makeText(MainActivity.this, "Brak aplikacji do otwarcia linku.", Toast.LENGTH_SHORT).show(); }
+                }
+                return true;
+            }
+        });
         webView.setWebChromeClient(new WebChromeClient() {
             @Override public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
                 if (fileCallback != null) fileCallback.onReceiveValue(null);
@@ -85,7 +124,8 @@ public class MainActivity extends Activity {
     }
 
     @Override protected void onSaveInstanceState(Bundle outState) { webView.saveState(outState); super.onSaveInstanceState(outState); }
-    @Override public void onBackPressed() { if (webView != null && webView.canGoBack()) webView.goBack(); else super.onBackPressed(); }
+    private void navigateBack() { if (webView != null && webView.canGoBack()) webView.goBack(); else finish(); }
+    @Override public void onBackPressed() { navigateBack(); }
     @Override protected void onDestroy() { if (fileCallback != null) fileCallback.onReceiveValue(null); if (webView != null) webView.destroy(); super.onDestroy(); }
 
     private class GameBridge {
