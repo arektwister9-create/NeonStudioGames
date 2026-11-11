@@ -1,0 +1,21 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const vm=require('node:vm');
+const fs=require('node:fs');
+const source=fs.readFileSync('app/src/main/assets/audio.js','utf8');
+function boot(saved){
+ const nodes=new Map(),storage=new Map(saved===undefined?[]:[['neonEmpireAudio',saved]]),contexts=[],timers=new Map(),listeners={};let nextId=1;
+ const param=()=>({value:0,setValueAtTime(){},linearRampToValueAtTime(){},exponentialRampToValueAtTime(){},setTargetAtTime(v){this.value=v}});
+ class AudioContext{constructor(){this.state='suspended';this.currentTime=0;this.destination={};this.oscillators=[];this.gains=[];contexts.push(this)}createGain(){const n={gain:param(),connect(){},disconnect(){}};this.gains.push(n);return n}createDynamicsCompressor(){return {threshold:param(),ratio:param(),connect(){}}}createOscillator(){const n={frequency:param(),connect(){},disconnect(){},start(){},stop(){}};this.oscillators.push(n);return n}async resume(){this.state='running'}async suspend(){this.state='suspended'}}
+ const document={hidden:false,getElementById(id){if(!nodes.has(id))nodes.set(id,{setAttribute(){},value:'',textContent:''});return nodes.get(id)},addEventListener(k,fn){listeners[k]=fn}};
+ const context={window:{AudioContext,addEventListener(k,fn){listeners[k]=fn}},document,localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},setInterval(fn){const id=nextId++;timers.set(id,fn);return id},clearInterval(id){timers.delete(id)},console};
+ vm.runInNewContext(source,context);context.window.NeonAudio.init();return {audio:context.window.NeonAudio,nodes,storage,contexts,timers,listeners,document};
+}
+test('no audio context or music is created on page load',()=>{const b=boot();assert.equal(b.contexts.length,0);assert.equal(b.timers.size,0);assert.equal(b.audio.getPreferences().musicConsent,false)});
+test('effects gesture does not opt player into music',async()=>{const b=boot();await b.audio.gesture();b.audio.sfx('click');assert.equal(b.contexts.length,1);assert.equal(b.contexts[0].oscillators.length,2);assert.equal(b.timers.size,0);assert.equal(b.audio.getPreferences().musicConsent,false)});
+test('explicit music toggle schedules original score; revoke immediately stops scheduling',async()=>{const b=boot();await b.nodes.get('musicToggle').onclick();assert.equal(b.audio.getPreferences().musicConsent,true);assert.equal(b.timers.size,1);assert.ok(b.contexts[0].oscillators.length>=6);await b.nodes.get('musicToggle').onclick();assert.equal(b.timers.size,0);assert.equal(JSON.parse(b.storage.get('neonEmpireAudio')).musicConsent,false)});
+test('volume preferences are independent, persistent and clamped',()=>{const b=boot('{"musicVolume":2,"effectsVolume":-5,"musicConsent":"yes"}');assert.equal(b.audio.getPreferences().musicVolume,1);assert.equal(b.audio.getPreferences().effectsVolume,0);assert.equal(b.audio.getPreferences().musicConsent,false);b.nodes.get('musicVolume').oninput({target:{value:35}});b.nodes.get('effectsVolume').oninput({target:{value:78}});const prefs=JSON.parse(b.storage.get('neonEmpireAudio'));assert.equal(prefs.musicVolume,.35);assert.equal(prefs.effectsVolume,.78)});
+test('returning permission still waits for user gesture after reload',()=>{const b=boot('{"musicConsent":true,"musicVolume":0.2}');assert.equal(b.contexts.length,0);assert.equal(b.timers.size,0)});
+test('background suspends audio and clears music scheduler',async()=>{const b=boot();await b.nodes.get('musicToggle').onclick();b.document.hidden=true;b.listeners.visibilitychange();assert.equal(b.contexts[0].state,'suspended');assert.equal(b.timers.size,0);b.document.hidden=false;await b.listeners.visibilitychange();assert.equal(b.contexts[0].state,'running')});
+test('invalid preference JSON falls back safely',()=>{const b=boot('invalid');assert.equal(b.audio.getPreferences().musicConsent,false);assert.equal(b.audio.getPreferences().effectsVolume,.55)});
+test('zero effect volume is silent and rapid clicks are throttled',async()=>{const b=boot();await b.audio.gesture();for(let i=0;i<50;i++)b.audio.sfx('click');assert.equal(b.contexts[0].oscillators.length,2);b.nodes.get('effectsVolume').oninput({target:{value:0}});b.audio.sfx('planet');assert.equal(b.contexts[0].oscillators.length,2)});
