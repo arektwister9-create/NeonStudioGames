@@ -91,6 +91,7 @@ with sync_playwright() as p:
     # First campaign loop: real charge, pulse, wrong node, correct sync, durable reward.
     journey=dict(legacy,energy=1000,total=1000,planets={},levels={'drone':3,'solar':0,'server':0,'reactor':0,'portal':0})
     c,page=open_game(journey)
+    page.locator('#legacyCampaign > summary').click()
     assert page.locator('#beginSync').is_disabled()
     page.locator('#campaignGoals .goal-link').first.click();assert page.locator('#tap').evaluate('e=>e===document.activeElement');assert page.locator('#tap').get_attribute('tabindex')!='-1'
     for _ in range(12):page.locator('#tap').dispatch_event('click')
@@ -111,6 +112,7 @@ with sync_playwright() as p:
     # Final campaign objective and genuine last sequence open the persistent gate.
     finale=dict(legacy,energy=1e8,total=1e8,colonies={'luna':10,'mars':10,'titan':10},technologies={'lattice':True,'resonance':True,'heart':True},coreCampaign={'chapter':5,'pulses':17,'charge':9})
     c,page=open_game(finale,width=390)
+    page.locator('#legacyCampaign > summary').click()
     page.locator('#tap').dispatch_event('click');page.locator('#releasePulse').click();page.locator('#beginSync').click()
     for node in [1,2,0,2,1,0]:page.locator('[data-node="'+str(node)+'"]').click()
     assert page.locator('#coreStage').evaluate('e=>e.classList.contains("gate-open")')
@@ -120,7 +122,53 @@ with sync_playwright() as p:
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
     page.screenshot(path=str(OUT/'gate-open.png'),full_page=True)
     c.close()
+    # Play real encounters through visible controls and build a visible dock.
+    c,page=open_game()
+    page.locator('#startExpedition').click();assert page.locator('#tap').is_disabled()
+    page.locator('[data-target]').first.click()
+    page.evaluate("""window.finishOperation=()=>{let steps=0;while(document.querySelector('[data-target]')&&steps++<300){let target=document.querySelector('[data-target]');const tool=[0,1,2].find(i=>target.classList.contains('target-'+i));document.querySelector('[data-tool="'+tool+'"]').click();document.querySelector('[data-target]').click()}if(steps>=300)throw Error('Encounter stalled')};window.finishOperation()""")
+    assert page.locator('#expeditionLevel').inner_text()=='POZIOM 2 / 30'
+    assert '2 MATERIAŁÓW' in page.locator('#stationMaterials').inner_text()
+    page.locator('[data-building-upgrade="dock"]').click()
+    assert page.locator('[data-building="dock"]').get_attribute('data-level')=='1'
+    assert page.locator('[data-building="dock"] .building-model i').count()==1
+    assert page.locator('#stationOrbit .orbital-dock').count()==1
+    page.screenshot(path=str(OUT/'station-first-dock.png'),full_page=True)
+    # Reach scanner, use a wrong tool, preserve the active encounter through import.
+    page.locator('#startExpedition').click();page.evaluate('window.finishOperation()')
+    page.locator('#startExpedition').click()
+    tool=page.locator('[data-target]').first.evaluate("e=>[0,1].find(i=>e.classList.contains('target-'+i))")
+    page.locator('[data-tool="'+str(1-tool)+'"]').click();page.locator('[data-target]').first.click()
+    assert 'OSŁONA 4 / 6' in page.locator('#expeditionHealth').inner_text()
+    state=page.evaluate('localStorage.getItem("neonEmpireSave")')
+    page.locator('#importFile').set_input_files({'name':'active.json','mimeType':'application/json','buffer':state.encode()})
+    assert 'OSŁONA 4 / 6' in page.locator('#expeditionHealth').inner_text()
+    before_repair=page.evaluate('JSON.parse(localStorage.getItem("neonEmpireSave"))')
+    page.locator('#repairExpedition').click();assert 'OSŁONA 6 / 6' in page.locator('#expeditionHealth').inner_text()
+    after_repair=page.evaluate('JSON.parse(localStorage.getItem("neonEmpireSave"))')
+    assert after_repair['energy']==before_repair['energy']-100 and after_repair['total']==before_repair['total']
+    page.evaluate('window.finishOperation()')
+    for _ in range(2):page.locator('#startExpedition').click();page.evaluate('window.finishOperation()')
+    assert page.locator('#coreStage').get_attribute('data-sector')=='1'
+    assert page.evaluate('JSON.parse(localStorage.getItem("neonEmpireSave")).expedition.cleared')==5
+    page.screenshot(path=str(OUT/'sector-two.png'),full_page=True)
+    c.close()
+    # Final sector and completed station are visibly distinct from the starting camp.
+    endgame=dict(legacy,expedition={'cleared':29,'materials':20,'modules':{'dock':6,'lab':6,'shield':6}})
+    c,page=open_game(endgame,width=320)
+    assert page.locator('#coreStage').get_attribute('data-sector')=='5'
+    assert page.locator('#coreName').inner_text()=='IMPERIUM GALAKTYCZNE'
+    page.locator('#startExpedition').click()
+    page.screenshot(path=str(OUT/'guardian-active-320px.png'),full_page=True)
+    page.locator('#coreStage').screenshot(path=str(OUT/'guardian-playfield.png'))
+    page.evaluate("""let steps=0;while(document.querySelector('[data-target]')&&steps++<200){const target=document.querySelector('[data-target]');const tool=[0,1,2].find(i=>target.classList.contains('target-'+i));document.querySelector('[data-tool="'+tool+'"]').click();document.querySelector('[data-target]').click()}if(steps>=200)throw Error('Finale stalled')""")
+    assert 'UKOŃCZONO' in page.locator('#expeditionLevel').inner_text()
+    assert page.evaluate('JSON.parse(localStorage.getItem("neonEmpireSave")).expedition.cleared')==30
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    page.screenshot(path=str(OUT/'galactic-station-320px.png'),full_page=True)
+    page.locator('#coreStage').screenshot(path=str(OUT/'complete-core-playfield.png'))
+    c.close()
     assert not errors,errors
     b.close()
 server.shutdown()
-print('PASS: touch/keyboard/focus, bounded effects, audio consent/volumes, 0.6.1/0.7.0 saves, offline cap, 30 colony levels, Titan technologies, export/import, 320px/800px, reduced motion, unlock animation, campaign charging/sync/retry/rewards and final gate; no JS errors')
+print('PASS: touch/keyboard/focus, bounded effects, audio consent/volumes, 0.6.1/0.7.0 saves, offline cap, 30 colony levels, Titan technologies, export/import, 320px/800px, reduced motion, unlock animation, campaign charging/sync/retry/rewards and final gate; expeditions, tool errors, construction, save/import during combat, sector transition and level 30; no JS errors')

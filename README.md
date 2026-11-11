@@ -1,12 +1,41 @@
-# NEON EMPIRE 0.8.0 — Android
+# NEON EMPIRE 0.9.0 — Android
 
-Polska gra idle offline. `versionName 0.8.0`, `versionCode 10`; identyfikatory Android i zasoby startowe z 0.7.0 pozostają zachowane.
+Polska gra idle offline. `versionName 0.9.0`, `versionCode 11`; identyfikatory Android i zasoby startowe z 0.7.0 pozostają zachowane.
 
-## Nowość: kampania „Przebudzenie rdzenia”
+## Nowość: 30 aktywnych poziomów i widoczna stacja
 
-Cel gry: zdobyć sześć fragmentów i otworzyć bramę międzygwiezdną. Przy rdzeniu widać aktualny rozdział, fabułę, wymagania, nagrodę i skróty prowadzące do potrzebnych kolonii, badań i ulepszeń. Celami są konkretne konstrukcje i technologie, nie samo przekraczanie kolejnych progów energii.
+Główna rozgrywka to teraz ekspedycje przy rdzeniu. Poziomów nie da się odblokować zapasem energii: trzeba ukończyć wcześniejsze operacje i rozbudować stację. Każdy poziom ma własną nazwę. Sześć sektorów zmienia otoczenie i kolorystykę pola gry.
 
-Każde dotknięcie ładuje pierścień rdzenia. Po 12 dotknięciach gracz może **wyzwolić puls**, który daje energię i zasila latarnie potrzebne w kampanii. Ładunek nie wygasa. Kolejne fragmenty zwiększają siłę pulsów o 15% wartości bazowej i co dwa rozdziały zmniejszają liczbę wymaganych dotknięć. Nagroda pulsu: `ceil(max(25, produkcja × 15 + energiaDotknięcia × 8) × (1 + 0.15 × ukończoneRozdziały))`. Puls nie zmienia stałych bonusów planet ani produkcji offline.
+| Poziomy | Sektor | Finał sektora |
+| --- | --- | --- |
+| 1–5 | Pas rozbitków | Strażnik pasa |
+| 6–10 | Lodowa granica | Strażnik lodu |
+| 11–15 | Mgławica burz | Strażnik mgławicy |
+| 16–20 | Kuźnia gwiazd | Strażnik kuźni |
+| 21–25 | Cicha otchłań | Strażnik otchłani |
+| 26–30 | Serce galaktyki | Architekt rdzenia |
+
+Zwykłe poziomy mają dwie fale po trzy cele. Użyj narzędzia pasującego do symbolu i podpisu celu: **Impuls ϟ**, **Skaner ◎** (po poziomie 2), **Osłona ⬡** (po poziomie 7). Strażnicy mają trzy fazy i zmieniają słabość po poprawnym trafieniu. Złe narzędzie kosztuje 2 punkty osłony. Nie ma presji czasu. Porażka lub powrót do stacji nie zabiera materiałów, budynków ani ukończonych poziomów.
+
+Za pierwsze ukończenie poziomu otrzymujesz `2 + indeksSektora` materiałów (sektor pierwszy ma indeks 0) i `100 × numerPoziomu × (indeksSektora + 1)` energii. Powtórki dają mniej materiałów (`1 + floor(indeksSektora / 2)`) i nie powtarzają nagrody energii. Energia ma dodatkowe zastosowanie w walce: jednokrotna awaryjna naprawa przywraca do 4 osłony za `100 × (indeksSektora + 1)²` energii. Nie zmniejsza łącznej zdobytej energii.
+
+**Buduj rzeczywistą stację z trzech modułów, każdy na 6 poziomach:**
+
+- **Dok dronów:** odblokowuje atak obszarowy po trzech poprawnych trafieniach; obrażenia dronów `1 + poziomDoku`.
+- **Laboratorium:** obrażenia narzędzia `1 + floor(poziomLaboratorium / 2)`.
+- **Generator osłon:** wytrzymałość na początku operacji `6 + 2 × poziomGeneratora`.
+
+Kolejny poziom modułu kosztuje `2 × nowyPoziom` materiałów. Moduły pojawiają się przy rdzeniu i na makiecie stacji, a kolejne segmenty rozbudowy pozostają widoczne. Co pięć poziomów trzeba podnieść dowolny moduł o kolejny stopień: sektor 2 wymaga modułu 1, sektor 6 modułu 5. Wszystkie 30 pierwszych zwycięstw daje 135 materiałów; pełna budowa trzech modułów do poziomu 6 kosztuje 126. Test przechodzi cały ciąg bez konieczności powtarzania poziomów.
+
+Mapa pozwala wybierać ukończone poziomy i kolejny dostępny. Trwałe dane znajdują się w opcjonalnym polu `expedition`: ukończone poziomy, materiały, moduły, narzędzie i bieżąca walka (faza, wytrzymałość celów, osłona, wsparcie dronów i użycie naprawy). Import starego zapisu zaczyna nowe ekspedycje od poziomu 1, zachowując dotychczasowe postępy. Nie ma resetu/prestiżu. Udane ataki ładują także puls starszej kampanii.
+
+Widoki stacji i mapy nie są przebudowywane przy każdym trafieniu; aktualizują się po zmianie infrastruktury. Cele używają natywnych przycisków z opisami, a narzędzia mają symbole i tekst, nie tylko kolor. Wszystkie funkcje działają offline; operacje nie rozgrywają się automatycznie w tle. Dotychczasowa produkcja i limit ośmiu godzin offline pozostają zachowane.
+
+## Dodatkowa kampania „Przebudzenie rdzenia”
+
+Cel dodatkowej kampanii: zdobyć sześć fragmentów i otworzyć bramę międzygwiezdną. Przy rdzeniu widać aktualny rozdział, fabułę, wymagania, nagrodę i skróty prowadzące do potrzebnych kolonii, badań i ulepszeń. Celami są konkretne konstrukcje i technologie, nie samo przekraczanie kolejnych progów energii.
+
+Panel kampanii i pulsów można rozwinąć pod mapą poziomów. Każde dotknięcie ładuje pierścień rdzenia. Po 12 dotknięciach gracz może **wyzwolić puls**, który daje energię i zasila latarnie potrzebne w kampanii. Ładunek nie wygasa. Kolejne fragmenty zwiększają siłę pulsów o 15% wartości bazowej i co dwa rozdziały zmniejszają liczbę wymaganych dotknięć. Nagroda pulsu: `ceil(max(25, produkcja × 15 + energiaDotknięcia × 8) × (1 + 0.15 × ukończoneRozdziały))`. Puls nie zmienia stałych bonusów planet ani produkcji offline.
 
 | Rozdział | Cel rozwoju | Pulsy łącznie | Nagroda energii |
 | --- | --- | ---: | ---: |
@@ -75,12 +104,13 @@ for file in app/src/main/assets/*.js; do node --check "$file"; done
 node tests/economy.test.cjs
 node tests/audio.test.cjs
 node tests/campaign.test.cjs
+node tests/expedition.test.cjs
 # Python Playwright i Chromium wymagane do testu UI:
 python tests/browser_smoke.py
 # JDK 17+, Gradle 8.9, Android SDK 35:
 gradle --no-daemon assembleDebug bundleRelease
 ```
 
-GitHub Actions uruchamia te kontrole, buduje APK/AAB, sprawdza podpis, wersję i integralność wszystkich zasobów w APK, a następnie instaluje i uruchamia aplikację w emulatorze Androida. Po powodzeniu artefakt `neon-empire-0.8.0-apk` zawiera `app-debug.apk` i `SHA256SUMS`. `neon-empire-0.8.0-aab` zawiera bundle. Bez sekretów podpisu AAB pozostaje niepodpisany.
+GitHub Actions uruchamia te kontrole, buduje APK/AAB, sprawdza podpis, wersję i integralność wszystkich zasobów w APK, a następnie instaluje i uruchamia aplikację w emulatorze Androida. Po powodzeniu artefakt `neon-empire-0.9.0-apk` zawiera `app-debug.apk` i `SHA256SUMS`. `neon-empire-0.9.0-aab` zawiera bundle. Bez sekretów podpisu AAB pozostaje niepodpisany.
 
 Opcjonalne sekrety wydawnicze: `NEON_KEYSTORE_BASE64`, `NEON_KEYSTORE_PASSWORD`, `NEON_KEY_ALIAS`, `NEON_KEY_PASSWORD`. Ranking globalny nadal wymaga konfiguracji Google Play Games.
