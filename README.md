@@ -1,29 +1,23 @@
-# NEON EMPIRE 0.6.1 — Android
+# NEON EMPIRE 0.7.0 — Android
 
-Wersja 0.6.1 bazuje na oryginalnym HTML 0.6.0, zachowując format zapisu `version: 5` i klucz `neonEmpireSave`.
+Wersja 0.7.0 rozwija klikalny rdzeń i ekspansję planetarną. Zachowuje klucz `neonEmpireSave`, format zapisu `version: 5`, dotychczasowe bonusy planet oraz produkcję offline z limitem 8 godzin.
 
-## Zmiany
-- Naliczanie produkcji offline po powrocie aplikacji z tła (limit 8 godzin).
-- Opcjonalne podpisywanie AAB w GitHub Actions z wykorzystaniem GitHub Secrets.
-- Kontrola składni JavaScript w workflow.
-- `versionCode 7`, `versionName 0.6.1`.
+## Nowości
+
+- Sześć form rdzenia: Iskra, Pulsator, Reaktor, Nexus, Osobliwość i Serce Imperium.
+- Animowane pierścienie i efekty ewolucji z obsługą `prefers-reduced-motion`.
+- Wizualne kolonie Luna-9, Mars Prime i Tytan, rozwijające się wraz z postępem.
+- Oryginalna neonowa ikona Android w pięciu gęstościach oraz ekran startowy.
+- `versionCode 8`, `versionName 0.7.0`.
 
 ## Kompilacja
 
-GitHub Actions uruchamia kompilację automatycznie po zmianach na gałęzi `main` oraz ręcznie przez **Actions → Build NEON EMPIRE Android → Run workflow**. Po udanym przebiegu pobierz artefakt `neon-empire-0.6.1-apk`; zawiera instalacyjny `app-debug.apk`.
+GitHub Actions waliduje JavaScript i buduje instalacyjny APK oraz AAB. Artefakty nazywają się `neon-empire-0.7.0-apk` i `neon-empire-0.7.0-aab`.
 
-Lokalnie projekt wymaga JDK 17, Android SDK 35 i Gradle 8.9. Polecenie kompilacji:
+Lokalnie wymagane są JDK 17, Android SDK 35 i Gradle 8.9:
 
 ```shell
 gradle --no-daemon assembleDebug bundleRelease
 ```
 
-Do podpisania wydania ustaw sekrety repozytorium:
-- `NEON_KEYSTORE_BASE64`: plik JKS zakodowany Base64
-- `NEON_KEYSTORE_PASSWORD`
-- `NEON_KEY_ALIAS`
-- `NEON_KEY_PASSWORD`
-
-Bez tych sekretów debug APK będzie działać, ale release AAB pozostanie niepodpisany i nie nadaje się do przesłania do Google Play. **Nigdy nie umieszczaj pliku JKS ani haseł w repozytorium.**
-
-Ranking Google Play Games nadal wymaga konfiguracji w Play Console. Nie przetestowano jeszcze aplikacji na fizycznym telefonie ani nie uruchomiono kompilacji Android w tym środowisku.
+Opcjonalne podpisanie AAB korzysta z sekretów `NEON_KEYSTORE_BASE64`, `NEON_KEYSTORE_PASSWORD`, `NEON_KEY_ALIAS` i `NEON_KEY_PASSWORD`. Kluczy i haseł nie należy umieszczać w repozytorium.

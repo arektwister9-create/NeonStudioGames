@@ -27,15 +27,7 @@ jobs:
           yes | sdkmanager --licenses >/dev/null
           sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - name: Validate JavaScript
-        run: |
-          python3 - <<'PYJS'
-          import re
-          from pathlib import Path
-          html=Path('app/src/main/assets/index.html').read_text()
-          script=re.search(r'<script>(.*?)</script>', html, re.S).group(1)
-          Path('/tmp/neon.js').write_text(script)
-          PYJS
-          node --check /tmp/neon.js
+        run: node --check app/src/main/assets/game.js
       - name: Prepare upload keystore (optional)
         env:
           NEON_KEYSTORE_BASE64: ${{ secrets.NEON_KEYSTORE_BASE64 }}
@@ -53,14 +45,14 @@ jobs:
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
-          name: neon-empire-0.6.1-apk
+          name: neon-empire-0.7.0-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
       - name: Upload Play Store bundle
         uses: actions/upload-artifact@v4
         with:
-          name: neon-empire-0.6.1-aab
+          name: neon-empire-0.7.0-aab
           path: app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 30
