@@ -1,34 +1,3 @@
-plugins { id 'com.android.application' }
-
-android {
-    namespace 'pl.neonempire.game'
-    compileSdk 35
-
-    defaultConfig {
-        applicationId 'pl.neonempire.game'
-        minSdk 23
-        targetSdk 35
-        versionCode 7
-        versionName '0.6.1'
-    }
-
-    signingConfigs {
-        release {
-            def storeFilePath = System.getenv('NEON_KEYSTORE_PATH')
-            if (storeFilePath) {
-                storeFile file(storeFilePath)
-                storePassword System.getenv('NEON_KEYSTORE_PASSWORD')
-                keyAlias System.getenv('NEON_KEY_ALIAS')
-                keyPassword System.getenv('NEON_KEY_PASSWORD')
-            }
-        }
-    }
-
-    buildTypes {
-        debug { applicationIdSuffix '.debug' }
-        release {
-            minifyEnabled false
-            if (System.getenv('NEON_KEYSTORE_PATH')) signingConfig signingConfigs.release
-        }
-    }
+plugins {
+    id 'com.android.application' version '8.7.3' apply false
 }
