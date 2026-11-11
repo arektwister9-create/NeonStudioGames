@@ -11,3 +11,5 @@ local.properties
 .private/
 *signing-credentials*
 *UPLOAD_KEY_BACKUP*
+
+node_modules/

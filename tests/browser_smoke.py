@@ -17,10 +17,11 @@ legacy={'version':5,'energy':99,'total':250000,'taps':101,'levels':{'drone':2,'s
 with sync_playwright() as p:
     b=p.chromium.launch(headless=True,executable_path=os.environ.get('NEON_CHROMIUM') or shutil.which('chromium') or p.chromium.executable_path,args=['--no-sandbox'])
     errors=[]
-    def open_game(save=None,width=390):
+    def open_game(save=None,width=390,legacy_runtime=False):
         context=b.new_context(viewport={'width':width,'height':844},has_touch=True)
         page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
         init='Date.now=()=>'+str(NOW)+';'
+        if legacy_runtime:init+='Object.values=undefined;Object.entries=undefined;Object.fromEntries=undefined;Element.prototype.append=undefined;Element.prototype.replaceChildren=undefined;NodeList.prototype.forEach=undefined;Blob.prototype.text=undefined;'
         if save is not None:init+='localStorage.setItem("neonEmpireSave",'+json.dumps(json.dumps(save))+');'
         page.add_init_script(init);page.goto(url);page.wait_for_selector('#coreName')
         return context,page
@@ -174,6 +175,12 @@ with sync_playwright() as p:
     c,page=open_game(width=1280)
     page.set_viewport_size({'width':1280,'height':720});page.locator('#tap').click();page.locator('#startExpedition').click();page.locator('[data-target]').first.click()
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    c.close()
+    c,page=open_game(legacy,legacy_runtime=True)
+    page.locator('#tap').click();page.locator('#startExpedition').click();page.locator('[data-target]').first.click()
+    page.locator('#importFile').set_input_files({'name':'legacy.json','mimeType':'application/json','buffer':json.dumps(legacy).encode()})
+    assert page.locator('#energy').inner_text()=='99'
+    assert page.locator('#compatNotice').is_hidden()
     c.close()
     assert not errors,errors
     b.close()

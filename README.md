@@ -2,6 +2,12 @@
 
 Polska gra idle offline. `versionName 0.9.1`, `versionCode 12`; identyfikatory Android i zasoby startowe z 0.7.0 pozostają zachowane.
 
+## Zgodność Android WebView
+
+HTML ładuje lokalne skrypty z `app/src/main/assets/compat/`, kompilowane Babel do składni starszego WebView. Pliki źródłowe pozostają bezpośrednio w `assets/` i są używane przez testy logiki. Mały lokalny shim uzupełnia m.in. `replaceChildren`, `Object.fromEntries` i `Blob.text`, więc import zapisu nie wymaga najnowszego silnika. Żadna biblioteka ani skrypt nie są pobierane przez grę z internetu.
+
+Po zmianie źródłowego JavaScript wykonaj `npm ci` i `npm run build:runtime`, zatwierdź także wygenerowane pliki. CI odrzuca nieaktualny runtime i sprawdza składnię ES2015 parserem Acorn. Przy bardzo starym WebView bez obsługi zmiennych CSS aplikacja pokazuje komunikat aktualizacji zamiast pustego ekranu; nie kasuje danych.
+
 ## Publikacja w Google Play
 
 Wydanie 0.9.1 celuje w Androida 16 / API 36, korzysta z AGP 8.10.1, Gradle 8.11.1 i JDK 17. Dodano obsługę bezpiecznych obszarów ekranu, systemowego przycisku Wstecz, orientacji poziomej i adaptacyjną ikonę. Polityka prywatności jest dostępna z menu gry oraz w `docs/privacy/`. Nieudostępniony ranking globalny nie jest wyświetlany w menu sklepowej wersji.

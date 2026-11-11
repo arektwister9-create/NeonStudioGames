@@ -34,6 +34,9 @@ jobs:
         run: |
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "platforms;android-36" "build-tools;36.0.0"
+          npm ci --no-audit --no-fund
+          npm run build:runtime
+          git diff --exit-code -- app/src/main/assets/compat
           for file in app/src/main/assets/*.js; do node --check "$file"; done
           for file in tests/*.test.cjs; do node "$file"; done
       - name: Build signed release

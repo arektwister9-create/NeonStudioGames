@@ -28,11 +28,15 @@ jobs:
           sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - name: Validate JavaScript
         run: |
+          npm ci --no-audit --no-fund
+          npm run build:runtime
+          git diff --exit-code -- app/src/main/assets/compat
           for file in app/src/main/assets/*.js; do node --check "$file"; done
           node tests/economy.test.cjs
           node tests/audio.test.cjs
           node tests/campaign.test.cjs
           node tests/expedition.test.cjs
+          node tests/compat.test.cjs
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -62,7 +66,7 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee /tmp/neon-badging.txt
           grep -q "name='pl.neonempire.game.debug' versionCode='12' versionName='0.9.1'" /tmp/neon-badging.txt
           unzip -t "$APK"
-          for file in app/src/main/assets/*; do unzip -p "$APK" "assets/$(basename "$file")" | cmp - "$file"; done
+          while IFS= read -r -d '' file; do unzip -p "$APK" "${file#app/src/main/}" | cmp - "$file"; done < <(find app/src/main/assets -type f -print0)
           sha256sum "$APK" > app/build/outputs/apk/debug/SHA256SUMS
       - name: Enable emulator acceleration
         run: |

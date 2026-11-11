@@ -14,7 +14,7 @@ Wydawca: NEON GAMES STUDIO. Kontakt publiczny: arektwister9@gmail.com.
 ## Najpierw test wewnętrzny
 
 1. Otwórz https://play.google.com/console i wybierz **Utwórz aplikację**.
-2. Nazwa **NEON EMPIRE**, język polski, typ **Gra**. Przy pierwszej publikacji można wybrać **Bezpłatna**; wybierz ją tylko jeśli chcesz bezpłatnej dystrybucji — bezpłatnej aplikacji nie można później przełączyć na płatną w tej samej karcie. Gra obecnie nie zawiera reklam ani zakupów.
+2. Nazwa **NEON EMPIRE**, język polski, typ **Gra**. Przy pierwszej publikacji można wybrać **Bezpłatna**; wybierz ją tylko jeśli chcesz bezpłatnej dystrybucji — bezpłatnej aplikacji nie można później przełączyć na płatną w tej samej karcie. Gra obecnie nie zawiera reklam ani zakupów. Na urządzeniu powinien być aktualny, zgodny z jego systemem Android System WebView.
 3. Zaakceptuj właściwe oświadczenia konsoli po ich przeczytaniu.
 4. Wejdź w **Testowanie i publikowanie → Testowanie → Testy wewnętrzne** (nazwy mogą różnić się zależnie od widoku), utwórz wersję i wybierz Play App Signing z kluczem Google.
 5. Wgraj podpisany AAB 0.9.1, nadaj nazwę wersji i użyj opisu zmian z `changelogs/12.txt`.
