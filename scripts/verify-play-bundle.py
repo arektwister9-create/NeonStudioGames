@@ -16,6 +16,6 @@ with zipfile.ZipFile(bundle) as z:
  assert z.testzip() is None,'Corrupt AAB'
  assert any(n.startswith('META-INF/') and n.endswith(('.RSA','.DSA','.EC')) for n in z.namelist()),'Unsigned AAB'
  for file in (root/'app/src/main/assets').rglob('*'):
-  if file.is_file():assert z.read('base/assets/'+str(file.relative_to(root/'app/src/main/assets')))==file.read_bytes(),'Asset mismatch: '+file.name
+  if file.is_file():assert z.read('base/assets/'+file.relative_to(root/'app/src/main/assets').as_posix())==file.read_bytes(),'Asset mismatch: '+file.name
  assert not any('/lib/' in n and n.endswith('.so') for n in z.namelist()),'Review native libraries for 16 KB page size compatibility'
 print('PASS: signed production AAB, '+version+' ('+code+'), target API 36+, non-debuggable, all offline assets and privacy policy, no bundled native libraries')

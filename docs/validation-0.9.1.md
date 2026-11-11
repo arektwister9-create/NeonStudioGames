@@ -16,3 +16,7 @@ Przed pierwszą publiczną publikacją należy przejść test wewnętrzny, uzupe
 ## Poprawka wykryta w prawdziwym emulatorze
 
 Pierwszy przebieg Actions dla tego wydania wykrył błąd parsera w fabrycznym WebView Androida 10: składnia optional chaining/nullish nie była obsługiwana. Dodano kompilowany lokalny runtime i polyfille DOM/Blob/Object, bez zmiany klucza ani formatu zapisów. Acorn sprawdza starszą składnię; test przeglądarkowy wymusza brak nowszych metod i potwierdza import zapisu. Wygenerowane skrypty są w repozytorium i są ładowane również w testach UI. Wynik ponownego testu emulatora jest sprawdzany oddzielnie.
+
+## Potwierdzony przebieg GitHub Actions
+
+https://github.com/arektwister9-create/NeonStudioGames/actions/runs/43103804429 — SUCCESS. Kod aplikacji: `688193700ca87ec2a7d6ca36f7b6f94ab26aa886`. Kontrola 40 testów, spójności wygenerowanego runtime, testy przeglądarkowe, kompilacja API 36, integralność APK oraz instalacja i uruchomienie na emulatorze Androida 10 zakończone powodzeniem. To zwykły workflow deweloperski (debug APK i development AAB), nie workflow podpisanego wydania Play. Podpisany produkcyjny AAB utworzono i zweryfikowano lokalnie z tego samego kodu. Nie wykonano jeszcze instalacji przez Google Play ani przesłania do Play Console.
