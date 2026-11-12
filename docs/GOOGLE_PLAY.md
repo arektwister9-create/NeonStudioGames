@@ -5,7 +5,7 @@ Wydawca: NEON GAMES STUDIO. Kontakt publiczny: arektwister9@gmail.com.
 ## Przygotowany pakiet
 
 - Produkcyjny identyfikator: `pl.neonempire.game` (bez `.debug`). Dostępność identyfikatora ostatecznie sprawdzi Play Console.
-- Wersja: 0.9.1, versionCode 12; minSdk 23, targetSdk 36 (Android 16).
+- Wersja: 0.9.2, versionCode 13; minSdk 24, targetSdk 36 (Android 16).
 - Plik do wgrania: podpisany **Android App Bundle `.aab`**, nie debug APK, nie ZIP źródeł i nie kopia klucza.
 - Wybrany model: Play App Signing z kluczem podpisu aplikacji generowanym przez Google. Lokalny prywatny klucz służy tylko do podpisywania przesyłanych AAB (upload key).
 - Polskie metadane w `fastlane/metadata/android/pl-PL/`; grafiki w `store-assets/`.
@@ -17,7 +17,7 @@ Wydawca: NEON GAMES STUDIO. Kontakt publiczny: arektwister9@gmail.com.
 2. Nazwa **NEON EMPIRE**, język polski, typ **Gra**. Przy pierwszej publikacji można wybrać **Bezpłatna**; wybierz ją tylko jeśli chcesz bezpłatnej dystrybucji — bezpłatnej aplikacji nie można później przełączyć na płatną w tej samej karcie. Gra obecnie nie zawiera reklam ani zakupów. Na urządzeniu powinien być aktualny, zgodny z jego systemem Android System WebView.
 3. Zaakceptuj właściwe oświadczenia konsoli po ich przeczytaniu.
 4. Wejdź w **Testowanie i publikowanie → Testowanie → Testy wewnętrzne** (nazwy mogą różnić się zależnie od widoku), utwórz wersję i wybierz Play App Signing z kluczem Google.
-5. Wgraj podpisany AAB 0.9.1, nadaj nazwę wersji i użyj opisu zmian z `changelogs/12.txt`.
+5. Wgraj podpisany AAB 0.9.2, nadaj nazwę wersji i użyj opisu zmian z `changelogs/13.txt`.
 6. Dodaj adresy testerów, zapisz wydanie testowe, sprawdź ostrzeżenia konsoli i uruchom test. Otwórz link do dołączenia na telefonie zalogowanym na konto testera.
 7. Sprawdź rzeczywistą instalację z Google Play, dźwięk, menu, import/eksport, obrót/duży ekran, powrót z tła i politykę prywatności. Obejrzyj raport przed publikacją (pre-launch report), jeśli konsola go wygeneruje.
 

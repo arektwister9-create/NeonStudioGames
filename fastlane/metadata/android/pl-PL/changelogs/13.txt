@@ -1,0 +1,1 @@
+Zgodność z automatyczną ochroną Google Play: Android 7.0 lub nowszy (minSdk 24). Zachowane poziomy, postępy, tryb offline i zgodność starszych zapisów.
